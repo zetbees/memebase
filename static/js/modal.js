@@ -183,6 +183,7 @@ const delBtn = document.getElementById("m-delete");
 /* -- Open modal (card click) -- */
 
 grid.addEventListener("click", (e) => {
+	if (e.shiftKey || e.ctrlKey || e.metaKey) return;
 	const favBtn = e.target.closest(".btn-fav");
 	if (favBtn) {
 		e.stopPropagation();

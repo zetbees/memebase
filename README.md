@@ -114,6 +114,7 @@ On first run, `config.default.toml` gets copied to `./data/config.toml`. Edit th
 | `Enter` | Meme dialog | Save changes |
 | `F` | Meme dialog | Toggle favorite |
 | `Left` / `Right` | Meme dialog | Open the previous or next meme in the current filtered results |
+| `Ctrl` / `Shift` + click | Grid | Select or deselect memes for bulk actions |
 
 ## Themes
 

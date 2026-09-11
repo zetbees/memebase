@@ -26,26 +26,30 @@ function clearSelection() {
 	updateSelectBar();
 }
 
-/* -- Shift+click selection -- */
+/* -- Modifier+click selection -- */
+
+function toggleCardSelection(card) {
+	const id = card.dataset.id;
+	if (selectedIds.has(id)) {
+		selectedIds.delete(id);
+		card.classList.remove("selected");
+	} else {
+		selectedIds.add(id);
+		card.classList.add("selected");
+	}
+	updateSelectBar();
+	resetSelDelete();
+}
 
 grid.addEventListener(
 	"click",
 	(e) => {
-		if (!e.shiftKey) return;
+		if (!e.shiftKey && !e.ctrlKey && !e.metaKey) return;
 		const card = e.target.closest(".card");
 		if (!card) return;
 		e.preventDefault();
 		e.stopPropagation();
-		const id = card.dataset.id;
-		if (selectedIds.has(id)) {
-			selectedIds.delete(id);
-			card.classList.remove("selected");
-		} else {
-			selectedIds.add(id);
-			card.classList.add("selected");
-		}
-		updateSelectBar();
-		resetSelDelete();
+		toggleCardSelection(card);
 	},
 	true,
 );
