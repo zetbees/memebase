@@ -310,6 +310,135 @@ dialog.closing::backdrop {
 	border-radius: 6px;
 	background: var(--color-bg-deep);
 }
+
+#modal {
+	max-width: none;
+	width: min(96vw, 1800px);
+	height: 94vh;
+}
+
+#modal .meme-modal-body {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+	gap: 1rem;
+	height: 100%;
+	max-height: none;
+}
+
+.meme-viewer {
+	position: relative;
+	min-width: 0;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	background: var(--color-bg-deep);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+#modal #m-media {
+	align-items: center;
+	overflow: auto;
+	padding: 0.75rem;
+	cursor: zoom-in;
+}
+
+#modal #m-media img,
+#modal #m-media video {
+	width: auto;
+	height: auto;
+	max-width: 100%;
+	max-height: 100%;
+}
+
+#modal #m-media.actual-size {
+	align-items: flex-start;
+	justify-content: flex-start;
+	cursor: zoom-out;
+}
+
+#modal #m-media.actual-size img {
+	max-width: none;
+	max-height: none;
+}
+
+.modal-editor {
+	min-width: 0;
+	min-height: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding-right: 0.25rem;
+}
+
+.modal-nav {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 2;
+	width: 2.75rem;
+	height: 4.5rem;
+	border: 1px solid var(--color-border-primary);
+	border-radius: 8px;
+	background: rgba(0, 0, 0, 0.65);
+	color: #fff;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.modal-nav:hover:not(:disabled) {
+	background: rgba(0, 0, 0, 0.85);
+}
+
+.modal-nav:disabled {
+	opacity: 0.25;
+	cursor: default;
+}
+
+.modal-nav-prev {
+	left: 0.75rem;
+}
+
+.modal-nav-next {
+	right: 0.75rem;
+}
+
+.viewer-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.6rem 0.75rem;
+	color: var(--color-text-muted);
+	font-size: 0.8rem;
+	border-top: 1px solid var(--color-border-subtle);
+}
+
+@media (max-width: 900px) {
+	#modal {
+		width: 96vw;
+		height: 96vh;
+	}
+
+	#modal .meme-modal-body {
+		display: flex;
+		flex-direction: column;
+		overflow-y: auto;
+	}
+
+	.meme-viewer {
+		min-height: 58vh;
+		flex: 0 0 58vh;
+	}
+
+	.modal-editor {
+		overflow: visible;
+	}
+}
 .modal-body label {
 	font-size: 0.85rem;
 	color: var(--color-text-muted);
@@ -335,6 +464,7 @@ dialog.closing::backdrop {
 	gap: 0;
 }
 .name-row input {
+	min-width: 0;
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 	border-right: none;

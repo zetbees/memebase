@@ -11,6 +11,98 @@ const infoModal = document.getElementById("info-modal");
 const infoList = document.getElementById("info-list");
 let currentId = null;
 let currentMeta = null;
+let initialFormState = "";
+
+document.getElementById("m-prev").innerHTML = icon("chevron-left", 28);
+document.getElementById("m-next").innerHTML = icon("chevron-right", 28);
+
+function formState() {
+	return JSON.stringify([mName.value, mTags.value, mDesc.value]);
+}
+
+function hasUnsavedChanges() {
+	return initialFormState && formState() !== initialFormState;
+}
+
+function visibleCards() {
+	return Array.from(grid.querySelectorAll(".card"));
+}
+
+function updateNavigation() {
+	const cards = visibleCards();
+	const index = cards.findIndex((card) => card.dataset.id === currentId);
+	const pageSize = getPerPage();
+	const totalPages = Math.max(1, Math.ceil(totalMemes / pageSize));
+	document.getElementById("m-prev").disabled = index <= 0 && currentPage <= 1;
+	document.getElementById("m-next").disabled = index === cards.length - 1 && currentPage >= totalPages;
+	const overallIndex = index < 0 ? 0 : (currentPage - 1) * pageSize + index + 1;
+	document.getElementById("m-position").textContent = `${overallIndex} / ${totalMemes}`;
+}
+
+function setActualSize(enabled) {
+	mMedia.classList.toggle("actual-size", enabled);
+	const zoomBtn = document.getElementById("m-zoom");
+	zoomBtn.textContent = enabled ? "Fit to screen" : "Actual size";
+	zoomBtn.setAttribute("aria-pressed", String(enabled));
+}
+
+function openCard(card) {
+	currentId = card.dataset.id;
+	const filename = card.dataset.filename;
+	const [stem, ext] = splitExt(filename);
+	const src = `/memes/${currentId}/${encodeURIComponent(filename)}`;
+	if (isVideo(filename)) {
+		mMedia.innerHTML = `<video src="${src}" controls loop autoplay></video>`;
+	} else {
+		mMedia.innerHTML = `<img src="${src}" alt="${esc(filename)}">`;
+	}
+	setActualSize(false);
+	mName.value = stem;
+	mExt.textContent = ext;
+	mTags.value = card.dataset.tags;
+	mDesc.value = card.dataset.desc;
+	initialFormState = formState();
+	const mFav = document.getElementById("m-fav");
+	const isFav = card.dataset.fav === "1";
+	mFav.innerHTML = `${icon("heart", 14)} Favorite`;
+	mFav.classList.toggle("active", isFav);
+	mDate.textContent = card.dataset.created ? card.dataset.created.replace("T", " ") : "";
+	document.getElementById("m-size").textContent = formatSize(Number(card.dataset.size) || 0);
+	document.getElementById("m-info").innerHTML = `${icon("info", 14)} Details`;
+	const mCopy = document.getElementById("m-copy");
+	mCopy.innerHTML =
+		icon(canCopy(filename) ? "clipboard" : "download", 14) +
+		(canCopy(filename) ? " Copy" : " Download");
+	autoOpenBtn.disabled = isVideo(filename);
+	autoOpenBtn.title = isVideo(filename) ? "Auto-detect is not available for videos" : "";
+	updateNavigation();
+	refreshIcons();
+	loadMeta(currentId);
+}
+
+async function navigateMeme(offset) {
+	if (hasUnsavedChanges() && !window.confirm("Discard unsaved changes?")) return;
+	let cards = visibleCards();
+	let index = cards.findIndex((card) => card.dataset.id === currentId);
+	let nextIndex = index + offset;
+	if (nextIndex >= 0 && nextIndex < cards.length) {
+		openCard(cards[nextIndex]);
+		return;
+	}
+	const totalPages = Math.max(1, Math.ceil(totalMemes / getPerPage()));
+	if (offset > 0 && currentPage < totalPages) {
+		currentPage += 1;
+	} else if (offset < 0 && currentPage > 1) {
+		currentPage -= 1;
+	} else {
+		return;
+	}
+	prevIds = new Set();
+	await load(search.value);
+	cards = visibleCards();
+	index = offset > 0 ? 0 : cards.length - 1;
+	if (cards[index]) openCard(cards[index]);
+}
 
 /* -- Metadata (prefetched on open for the info modal) -- */
 
@@ -113,36 +205,18 @@ grid.addEventListener("click", (e) => {
 	}
 	const card = e.target.closest(".card");
 	if (!card) return;
-	currentId = card.dataset.id;
-	const filename = card.dataset.filename;
-	const [stem, ext] = splitExt(filename);
-	const src = `/memes/${currentId}/${encodeURIComponent(filename)}`;
-	if (isVideo(filename)) {
-		mMedia.innerHTML = `<video src="${src}" controls loop autoplay></video>`;
-	} else {
-		mMedia.innerHTML = `<img src="${src}" alt="">`;
-	}
-	mName.value = stem;
-	mExt.textContent = ext;
-	mTags.value = card.dataset.tags;
-	mDesc.value = card.dataset.desc;
-	const mFav = document.getElementById("m-fav");
-	const isFav = card.dataset.fav === "1";
-	mFav.innerHTML = `${icon("heart", 14)} Favorite`;
-	mFav.classList.toggle("active", isFav);
-	mDate.textContent = card.dataset.created ? card.dataset.created.replace("T", " ") : "";
-	document.getElementById("m-size").textContent = formatSize(Number(card.dataset.size) || 0);
-	document.getElementById("m-info").innerHTML = `${icon("info", 14)} Details`;
-	const mCopy = document.getElementById("m-copy");
-	mCopy.innerHTML =
-		icon(canCopy(filename) ? "clipboard" : "download", 14) +
-		(canCopy(filename) ? " Copy" : " Download");
-	autoOpenBtn.disabled = isVideo(filename);
-	autoOpenBtn.title = isVideo(filename) ? "Auto-detect is not available for videos" : "";
+	openCard(card);
 	modal.showModal();
 	modal.focus();
-	refreshIcons();
-	loadMeta(currentId);
+});
+
+document.getElementById("m-prev").addEventListener("click", () => navigateMeme(-1));
+document.getElementById("m-next").addEventListener("click", () => navigateMeme(1));
+document.getElementById("m-zoom").addEventListener("click", () => {
+	setActualSize(!mMedia.classList.contains("actual-size"));
+});
+mMedia.addEventListener("click", (e) => {
+	if (e.target.matches("img")) setActualSize(!mMedia.classList.contains("actual-size"));
 });
 
 /* -- Favorite -- */
@@ -231,6 +305,11 @@ modal.addEventListener("close", () => {
 
 wireDialog(modal, { cancel: "m-cancel", submit: "m-save" });
 modal.addEventListener("keydown", (e) => {
+	if (!e.target.matches("input, textarea") && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+		e.preventDefault();
+		navigateMeme(e.key === "ArrowLeft" ? -1 : 1);
+		return;
+	}
 	if (e.key === "f" && !e.target.matches("input, textarea")) {
 		e.preventDefault();
 		document.getElementById("m-fav").click();
@@ -249,6 +328,7 @@ document.getElementById("m-save").addEventListener("click", async () => {
 		.filter(Boolean);
 	try {
 		await Api.updateMeme(currentId, body);
+		initialFormState = formState();
 	} catch (e) {
 		showAlert(`${mName.value}${mExt.textContent}: ${e.message}`, "error");
 		return;

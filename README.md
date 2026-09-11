@@ -34,6 +34,7 @@ A self-hosted, web-based home for your memes. Upload, tag, search, and hoard you
 - **AI auto-detect** - Let a vision model generate filenames, descriptions, and tags for you
 - **Bulk operations** - Select a bunch of memes at once for tagging, auto-detect, or deleting
 - **Copy & download** - One click to copy a meme to your clipboard or download it
+- **Big-screen browsing** - Full-window previews, actual-size zoom, and next/previous navigation that keeps your current filters and sort order
 - **Metadata** - Every upload gets its dimensions and duration recorded. Memes grabbed from a URL also remember where they came from: the site, who posted it, when, what the post said, and a link back
 - **Themes** - Ships with built-in themes and supports custom CSS themes
 - **Self-contained** - Everything lives in a single `./data` folder. Easy to back up, easy to move
@@ -112,6 +113,7 @@ On first run, `config.default.toml` gets copied to `./data/config.toml`. Edit th
 | `Escape` | Grid / Meme dialog | Clear selection or close dialog |
 | `Enter` | Meme dialog | Save changes |
 | `F` | Meme dialog | Toggle favorite |
+| `Left` / `Right` | Meme dialog | Open the previous or next meme in the current filtered results |
 
 ## Themes
 

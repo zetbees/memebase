@@ -96,8 +96,17 @@
 </dialog>
 
 <dialog id="modal">
-  <div class="modal-body">
-    <div id="m-media"></div>
+  <div class="modal-body meme-modal-body">
+    <section class="meme-viewer" aria-label="Meme preview">
+      <button class="modal-nav modal-nav-prev" id="m-prev" type="button" title="Previous meme" aria-label="Previous meme"></button>
+      <div id="m-media" title="Click to toggle actual size"></div>
+      <button class="modal-nav modal-nav-next" id="m-next" type="button" title="Next meme" aria-label="Next meme"></button>
+      <div class="viewer-toolbar">
+        <span id="m-position"></span>
+        <button class="btn-meta" id="m-zoom" type="button">Actual size</button>
+      </div>
+    </section>
+    <section class="modal-editor">
     <div class="modal-meta">
       <span id="m-fav" class="modal-fav" title="Toggle favorite"></span>
       <span id="m-date"></span>
@@ -128,6 +137,7 @@
       <button class="btn-close" id="m-cancel">Cancel</button>
       <button class="btn-save" id="m-save">Save</button>
     </div>
+    </section>
   </div>
 </dialog>
 {% endblock %}
