@@ -212,6 +212,9 @@ grid.addEventListener("click", (e) => {
 
 document.getElementById("m-prev").addEventListener("click", () => navigateMeme(-1));
 document.getElementById("m-next").addEventListener("click", () => navigateMeme(1));
+document.getElementById("m-close").addEventListener("click", () => {
+	document.getElementById("m-cancel").click();
+});
 document.getElementById("m-zoom").addEventListener("click", () => {
 	setActualSize(!mMedia.classList.contains("actual-size"));
 });
